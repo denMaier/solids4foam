@@ -47,6 +47,16 @@ function solids4Foam::convertCaseFormat()
         return 0
     fi
 
+    # GNU sed must be used
+    if sed --version 2>/dev/null | grep -q "GNU sed"
+    then
+        echo "GNU sed detected"
+    else
+        echo "Error: This script requires GNU sed. Please install it (e.g.,"
+        echo "via Homebrew: 'brew install gnu-sed') and use 'gsed' instead."
+        exit 1
+    fi
+
     # 1. symmetryPlane in foam extend becomes symmetry in OpenFOAM
 
     if [[ -n $(find "${CASE_DIR}" -name blockMeshDict*) ]]
@@ -243,6 +253,16 @@ function solids4Foam::convertCaseFormatFoamExtend()
 
     # Give sensible names to the argument
     CASE_DIR=$1
+
+    # GNU sed must be used
+    if sed --version 2>/dev/null | grep -q "GNU sed"
+    then
+        echo "GNU sed detected"
+    else
+        echo "Error: This script requires GNU sed. Please install it (e.g.,"
+        echo "via Homebrew: 'brew install gnu-sed') and use 'gsed' instead."
+        exit 1
+    fi
 
     # Un-do changes made in convertCaseFormat, if any
 
