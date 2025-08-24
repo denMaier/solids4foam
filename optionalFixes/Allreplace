@@ -70,11 +70,20 @@ then
 elif [[ $WM_PROJECT_VERSION == v* ]]
 then
     # Fix time index storage in the storeOldTimes function
-    replaceFile \
-        "OpenFOAM-v2012" \
-        "backwardDdtScheme.C" \
-        "$FOAM_SRC/finiteVolume/finiteVolume/ddtSchemes/backwardDdtScheme" \
-        "$FOAM_SRC/finiteVolume"
+    if [ "${WM_PROJECT_VERSION:1}" -ge 2412 ]
+    then
+        replaceFile \
+            "OpenFOAM-v2412" \
+            "backwardDdtScheme.C" \
+            "$FOAM_SRC/finiteVolume/finiteVolume/ddtSchemes/backwardDdtScheme" \
+            "$FOAM_SRC/finiteVolume"
+    else
+        replaceFile \
+            "OpenFOAM-v2012" \
+            "backwardDdtScheme.C" \
+            "$FOAM_SRC/finiteVolume/finiteVolume/ddtSchemes/backwardDdtScheme" \
+            "$FOAM_SRC/finiteVolume"
+    fi
 else
     # Fix time index storage in the storeOldTimes function
     replaceFile \
