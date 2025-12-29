@@ -55,13 +55,25 @@ bool Foam::fluidSolidInterface::updateCoupled()
         if (runTime().value() > (couplingStartTime_ - SMALL))
         {
             InfoIn("fluidSolidInterface::updateCoupled()")
-                << "Enabling fluid-solid coupling" << endl;
+                << "Enabling fluid-solid coupling" << nl << endl;
 
             // Enable coupling
             coupled_ = true;
 
             return true;
         }
+    }
+
+    return false;
+}
+
+
+bool Foam::fluidSolidInterface::newTimeStep() const
+{
+    if (curTimeIndex_ != runTime().timeIndex())
+    {
+        curTimeIndex_ = runTime().timeIndex();
+        return true;
     }
 
     return false;
@@ -303,6 +315,7 @@ Foam::fluidSolidInterface::fluidSolidInterface
         fsiProperties_.lookupOrAddDefault<scalar>("couplingStartTime", -1.0)
     ),
     predictor_(fsiProperties_.lookupOrAddDefault<Switch>("predictor", false)),
+    curTimeIndex_(-1),
     interfaceDeformationLimit_
     (
         fsiProperties_.lookupOrAddDefault<scalar>
