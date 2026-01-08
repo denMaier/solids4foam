@@ -206,19 +206,6 @@ void elasticWallPressureFvPatchScalarField::updateCoeffs()
         )
     );
 
-    const dimensionedScalar rhoFluid
-    (
-        transportProperties.lookup("rho")
-    );
-
-    if (debug)
-    {
-        Info<< "rhoSolid = " << max(rhoSolid)
-            << ", hs = " << max(hs)
-            << ", rhoFluid = " << rhoFluid.value()
-            << endl;
-    }
-
     // Update velocity and acceleration
 
     const fvPatch& p = patch();
@@ -237,21 +224,63 @@ void elasticWallPressureFvPatchScalarField::updateCoeffs()
     // time step in the fluidSolidInterface
     const scalarField prevDdtUn(n & prevAcceleration_);
 
-    if (pressure.dimensions() == dimPressure/dimDensity)
+    // Check if a density field is present
+    if (fsi.fluid().mesh().foundObject<volScalarField>("rho"))
     {
-        // p/rho
-        this->coeff0() = 1.0;
-        this->coeff1() = rhoSolid*hs/rhoFluid.value();
-        this->rhs() =
-            prevPressure_/rhoFluid.value()
-          - rhoSolid*hs*prevDdtUn/rhoFluid.value();
+        const scalarField& rhoFluid =
+            patch().lookupPatchField<volScalarField, scalar>("rho");
+
+        const dimensionSet& pDims =
+            fsi.fluid().mesh().lookupObject<volScalarField>("rho").dimensions();
+
+        if (pDims == dimPressure/dimDensity)
+        {
+            // p/rho
+            this->coeff0() = 1.0;
+            this->coeff1() = rhoSolid*hs/rhoFluid;
+            this->rhs() =
+                prevPressure_/rhoFluid - rhoSolid*hs*prevDdtUn/rhoFluid;
+        }
+        else
+        {
+            // p
+            this->coeff0() = 1.0;
+            this->coeff1() = rhoSolid*hs/rhoFluid;
+            this->rhs() = prevPressure_ - rhoSolid*hs*prevDdtUn;
+        }
     }
     else
     {
-        // p
-        this->coeff0() = 1.0;
-        this->coeff1() = rhoSolid*hs/rhoFluid.value();
-        this->rhs() = prevPressure_ - rhoSolid*hs*prevDdtUn;
+        // Lookup the density from the transport properties
+        const dimensionedScalar rhoFluid
+        (
+            transportProperties.lookup("rho")
+        );
+
+        if (debug)
+        {
+            Info<< "rhoSolid = " << max(rhoSolid)
+                << ", hs = " << max(hs)
+                << ", rhoFluid = " << rhoFluid.value()
+                << endl;
+        }
+
+        if (pressure.dimensions() == dimPressure/dimDensity)
+        {
+            // p/rho
+            this->coeff0() = 1.0;
+            this->coeff1() = rhoSolid*hs/rhoFluid.value();
+            this->rhs() =
+                prevPressure_/rhoFluid.value()
+              - rhoSolid*hs*prevDdtUn/rhoFluid.value();
+        }
+        else
+        {
+            // p
+            this->coeff0() = 1.0;
+            this->coeff1() = rhoSolid*hs/rhoFluid.value();
+            this->rhs() = prevPressure_ - rhoSolid*hs*prevDdtUn;
+        }
     }
 
     robinFvPatchField<scalar>::updateCoeffs();
