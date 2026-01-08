@@ -37,6 +37,7 @@ License
 #include "RBFMeshMotionSolver.H"
 #include "FieldSumOp.H"
 
+
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
@@ -968,14 +969,10 @@ void Foam::fluidSolidInterface::moveFluidMesh()
                 fixedValuePointPatchVectorField& motionUFluidPatch =
                     refCast<fixedValuePointPatchVectorField>
                     (
-#ifdef OPENFOAM_NOT_EXTEND
-                        motionU.boundaryFieldRef()
-                        [
-                            fluidPatchIndices()[interfaceI]
-                        ]
-#else
-                        motionU.boundaryField()[fluidPatchIndices()[interfaceI]]
-#endif
+                        boundaryFieldRef
+                        (
+                            motionU
+                        )[fluidPatchIndices()[interfaceI]]
                     );
 
                 motionUFluidPatch ==
@@ -998,8 +995,6 @@ void Foam::fluidSolidInterface::moveFluidMesh()
 
             const bool fvMotionSolver =
                 subMesh.foundObject<pointVectorField>("pointMotionU");
-
-            // Info << subMesh.boundaryMesh() << endl;
 
             if (fvMotionSolver)
             {
