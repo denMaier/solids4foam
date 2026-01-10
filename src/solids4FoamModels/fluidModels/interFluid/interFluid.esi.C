@@ -319,6 +319,12 @@ bool interFluid::evolve()
     surfaceScalarField& alphaPhi10 = alphaPhi10_;
     tmp<volScalarField>& rAU = rAU_;
 
+    if (!LTS)
+    {
+        #include "CourantNo.H"
+        #include "alphaCourantNo.H"
+    }
+
     // --- Pressure-velocity PIMPLE corrector loop
     while (pimple.loop())
     {
