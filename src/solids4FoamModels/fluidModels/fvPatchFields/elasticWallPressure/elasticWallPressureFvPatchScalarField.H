@@ -59,6 +59,11 @@ class elasticWallPressureFvPatchScalarField
         //  in the previous fsi iteration
         vectorField prevAcceleration_;
 
+        //- Optional constant solid thickness
+        //  If constantHs < SMALL, it indicates that it should not be used and
+        // instead a virtual solid thickness is calculated on the fly
+        const scalar constantHs_;
+
 public:
 
     //- Runtime type information

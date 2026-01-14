@@ -328,7 +328,12 @@ bool interFluid::evolve()
     // --- Pressure-velocity PIMPLE corrector loop
     while (pimple.loop())
     {
-        if (pimple.firstIter() || moveMeshOuterCorrectors)
+        if
+        (
+            pimple.firstIter()
+         || moveMeshOuterCorrectors
+         || fluidModel::fsiMeshUpdate()
+        )
         {
             if (fluidModel::fsiMeshUpdate())
             {

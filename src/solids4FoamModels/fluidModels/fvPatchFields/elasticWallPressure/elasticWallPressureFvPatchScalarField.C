@@ -38,7 +38,8 @@ elasticWallPressureFvPatchScalarField::elasticWallPressureFvPatchScalarField
 :
     robinFvPatchScalarField(p, iF),
     prevPressure_(p.patch().size(), 0),
-    prevAcceleration_(p.patch().size(), vector::zero)
+    prevAcceleration_(p.patch().size(), vector::zero),
+    constantHs_(-1.0)
 {}
 
 
@@ -52,7 +53,8 @@ elasticWallPressureFvPatchScalarField::elasticWallPressureFvPatchScalarField
 :
     robinFvPatchScalarField(ptf, p, iF, mapper),
     prevPressure_(p.patch().size(), 0),
-    prevAcceleration_(p.patch().size(), vector::zero)
+    prevAcceleration_(p.patch().size(), vector::zero),
+    constantHs_(ptf.constantHs_)
 {}
 
 
@@ -65,7 +67,8 @@ elasticWallPressureFvPatchScalarField::elasticWallPressureFvPatchScalarField
 :
     robinFvPatchScalarField(p, iF),
     prevPressure_(p.patch().size(), 0),
-    prevAcceleration_(p.patch().size(), vector::zero)
+    prevAcceleration_(p.patch().size(), vector::zero),
+    constantHs_(dict.lookupOrDefault<scalar>("constantHs", -1.0))
 {
     if (dict.found("value"))
     {
@@ -75,6 +78,16 @@ elasticWallPressureFvPatchScalarField::elasticWallPressureFvPatchScalarField
     if (dict.found("prevPressure"))
     {
         Field<scalar>::operator=(scalarField("prevPressure", dict, p.size()));
+    }
+
+    if (constantHs_ < SMALL)
+    {
+        Info<< type() << " " << patch().name() << ": constantHs unused" << endl;
+    }
+    else
+    {
+        Info<< type() << " " << patch().name() << ": constantHs = "
+            << constantHs_ << endl;
     }
 
     this->coeff0() = 1.0;
@@ -90,7 +103,8 @@ elasticWallPressureFvPatchScalarField::elasticWallPressureFvPatchScalarField
 :
     robinFvPatchScalarField(pivpvf),
     prevPressure_(pivpvf.prevPressure_),
-    prevAcceleration_(pivpvf.prevAcceleration_)
+    prevAcceleration_(pivpvf.prevAcceleration_),
+    constantHs_(pivpvf.constantHs_)
 {}
 #endif
 
@@ -103,7 +117,8 @@ elasticWallPressureFvPatchScalarField::elasticWallPressureFvPatchScalarField
 :
     robinFvPatchScalarField(pivpvf, iF),
     prevPressure_(pivpvf.prevPressure_),
-    prevAcceleration_(pivpvf.prevAcceleration_)
+    prevAcceleration_(pivpvf.prevAcceleration_),
+    constantHs_(pivpvf.constantHs_)
 {}
 
 
@@ -190,21 +205,17 @@ void elasticWallPressureFvPatchScalarField::updateCoeffs()
     const scalarField ap(sqrt(impK/rhoSolid));
 
     // Solid "virtual thickness"
-    const scalarField hs(ap*mesh.time().deltaT().value());
+    scalarField hs(patch().size(), constantHs_);
+    if (constantHs_ < SMALL)
+    {
+        // Calculate a virtual thickness based on the speed of sound aand time
+        // step
+        hs = ap*mesh.time().deltaT().value();
+    }
 
     // Fluid properties
-    const IOdictionary transportProperties
-    (
-        IOobject
-        (
-            "transportProperties",
-            mesh.time().constant(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE,
-            false  // Do not register
-        )
-    );
+    const dictionary& transportProperties =
+        db().lookupObject<IOdictionary>("transportProperties");
 
     // Update velocity and acceleration
 
@@ -230,12 +241,12 @@ void elasticWallPressureFvPatchScalarField::updateCoeffs()
         const scalarField& rhoFluid =
             patch().lookupPatchField<volScalarField, scalar>("rho");
 
-        const dimensionSet& pDims =
-            fsi.fluid().mesh().lookupObject<volScalarField>("rho").dimensions();
+        const dimensionSet& pDims = pressure.dimensions();
 
         if (pDims == dimPressure/dimDensity)
         {
             // p/rho
+            // Divide RHS by rhoFluid
             this->coeff0() = 1.0;
             this->coeff1() = rhoSolid*hs/rhoFluid;
             this->rhs() =
@@ -251,6 +262,7 @@ void elasticWallPressureFvPatchScalarField::updateCoeffs()
     }
     else
     {
+        Info<< "Did not find rho" << endl;
         // Lookup the density from the transport properties
         const dimensionedScalar rhoFluid
         (
