@@ -89,6 +89,9 @@ else
     failures=$((failures + 1))
 fi
 
+# Clean case
+./Allclean > /dev/null 2>&1 || true
+
 echo
 if (( failures == 0 )); then
     echo "============================================================"

@@ -66,6 +66,9 @@ for approach in "${APPROACHES[@]}"; do
     fi
 done
 
+# Clean the case
+( ./Allclean ) >/dev/null 2>&1 || true
+
 echo
 echo "============================================================"
 
