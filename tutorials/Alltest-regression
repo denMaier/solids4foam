@@ -23,6 +23,7 @@ REGRESSION_TESTS=(
     "solids/poroelasticity/rodAndSeabed"
     "solids/thermoelasticity/slabCooling"
     "solids/viscoelasticity/viscoTube"
+    "fluidSolidInteraction/beamInCrossFlow"
 )
 
 failures=0
