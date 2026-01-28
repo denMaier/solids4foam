@@ -654,8 +654,8 @@ foamPetscSnesHelper::foamPetscSnesHelper
             {
                 FatalErrorInFunction
                     << "Cannot find the PETSc options file: " << optionsFile
-                    << ". Either provide an option file or add the PETSc "
-                    << "solver settings to fvSolution/solvers/" << fieldName
+                    << ". Either provide an option file or add 'solver petsc;' "
+                    << "to fvSolution/solvers/" << fieldName << " dictionary"
                     << exit(FatalError);
             }
 

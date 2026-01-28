@@ -329,7 +329,11 @@ void elasticWallPressureFvPatchScalarField::updateCoeffs()
     }
     else
     {
-        Info<< "Did not find rho: looking up from transportProperties" << endl;
+        if (debug)
+        {
+            Info<< "Did not find rho: looking up from transportProperties"
+                << endl;
+        }
 
         // Fluid properties
         const dictionary& transportProperties =
