@@ -22,6 +22,7 @@ License
 #include "fvc.H"
 #include "fvm.H"
 #include "pointFieldFunctions.H"
+#include "compatibilityFunctions.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -73,7 +74,14 @@ Foam::linearElastic::linearElastic
         // Set the bulk modulus
         if (nu_.value() < 0.5)
         {
-            K_ = (nu_*E_/((1.0 + nu_)*(1.0 - 2.0*nu_))) + (2.0/3.0)*mu_;
+	    if (planeStress())
+            {
+                K_ = (nu_*E_/((1.0 + nu_)*(1.0 - nu_))) + (2.0/3.0)*mu_;
+	    }
+	    else
+	    {
+                K_ = (nu_*E_/((1.0 + nu_)*(1.0 - 2.0*nu_))) + (2.0/3.0)*mu_;
+	    }
         }
         else
         {
@@ -191,11 +199,33 @@ Foam::tmp<Foam::volScalarField> Foam::linearElastic::bulkModulus() const
         )
     );
 
-#ifdef OPENFOAM_NOT_EXTEND
-    tresult.ref().correctBoundaryConditions();
-#else
-    tresult().correctBoundaryConditions();
-#endif
+    tmpRef(tresult).correctBoundaryConditions();
+
+    return tresult;
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::linearElastic::shearModulus() const
+{
+    tmp<volScalarField> tresult
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "shearModulus",
+                mesh().time().timeName(),
+                mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh(),
+            mu_,
+            zeroGradientFvPatchScalarField::typeName
+        )
+    );
+
+    tmpRef(tresult).correctBoundaryConditions();
 
     return tresult;
 }
@@ -245,11 +275,11 @@ Foam::tmp<Foam::volScalarField> Foam::linearElastic::impK() const
 }
 
 
-#ifdef OPENFOAM_NOT_EXTEND
-Foam::scalarSquareMatrix Foam::linearElastic::materialTangent() const
+Foam::mat66 Foam::linearElastic::materialTangent() const
 {
-    // Prepare 6x6 tangent matrix
-    scalarSquareMatrix matTang(6, 0.0);
+    // Prepare 6x6 tangent matrix and fill with zeros
+    mat66 matTan;
+    matTan.clear();
 
     // Define matrix indices for readability
     const label XX = symmTensor::XX;
@@ -264,25 +294,24 @@ Foam::scalarSquareMatrix Foam::linearElastic::materialTangent() const
     const scalar twoMuLambda = 2*mu + lambda;
 
     // Set components
-    matTang(XX, XX) = twoMuLambda;
-    matTang(XX, YY) = lambda;
-    matTang(XX, ZZ) = lambda;
+    matTan(XX, XX) = twoMuLambda;
+    matTan(XX, YY) = lambda;
+    matTan(XX, ZZ) = lambda;
 
-    matTang(YY, XX) = lambda;
-    matTang(YY, YY) = twoMuLambda;
-    matTang(YY, ZZ) = lambda;
+    matTan(YY, XX) = lambda;
+    matTan(YY, YY) = twoMuLambda;
+    matTan(YY, ZZ) = lambda;
 
-    matTang(ZZ, XX) = lambda;
-    matTang(ZZ, YY) = lambda;
-    matTang(ZZ, ZZ) = twoMuLambda;
+    matTan(ZZ, XX) = lambda;
+    matTan(ZZ, YY) = lambda;
+    matTan(ZZ, ZZ) = twoMuLambda;
 
-    matTang(XY, XY) = mu;
-    matTang(YZ, YZ) = mu;
-    matTang(XZ, XZ) = mu;
+    matTan(XY, XY) = mu;
+    matTan(YZ, YZ) = mu;
+    matTan(XZ, XZ) = mu;
 
-    return matTang;
+    return matTan;
 }
-#endif
 
 
 const Foam::dimensionedScalar& Foam::linearElastic::mu() const

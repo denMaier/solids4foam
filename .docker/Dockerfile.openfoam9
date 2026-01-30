@@ -1,10 +1,10 @@
 ################################################################################
 # Dockerfile to build solids4foam with OpenFOAM-9
-# philip.cardiff@ucd.ie, Aug 2022
+# philip.cardiff@ucd.ie, January 2026
 ################################################################################
 
 # Set the base image
-FROM philippic/openfoam-9-ubuntu20.04:latest
+FROM philippic/openfoam-9:ubuntu20.04-petsc-no-openmp-system-blas
 
 # File Author / Maintainer
 MAINTAINER Philip Cardiff <philip.cardiff@ucd.ie>
@@ -18,7 +18,7 @@ COPY . /opt/solids4foam
 # Compile solids4Foam
 RUN source /opt/openfoam9/etc/bashrc && \
     cd /opt/solids4foam && \
-    ./Allwmake -j -s
+    export S4F_NO_FILE_FIXES=1; ./Allwmake -j -s
 
 # Clean log files
 RUN cd /opt/solids4foam && \

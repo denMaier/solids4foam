@@ -643,12 +643,12 @@ equal to $$3-4\nu$$.
 
   - Output file format:
 
-    ```c++
-    # Time minX minY minZ maxX maxY maxZ avX avY avZ
-    1 1 1 1 3 4 5 1.2 2 4
-    2 1 1 1 3 3 2 1 3 5
-    ...
-    ```
+      ```c++
+      # Time minX minY minZ maxX maxY maxZ avX avY avZ
+      1 1 1 1 3 4 5 1.2 2 4
+      2 1 1 1 3 3 2 1 3 5
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   `solids/hyperelasticity/longWall`
@@ -703,12 +703,12 @@ equal to $$3-4\nu$$.
 
   - Output file format:
 
-    ```c++
-    # Time forceX forceY forceZ normalForce
-    1 40 40 50 48
-    2 40 60 70 45
-    ...
-    ```
+      ```c++
+      # Time forceX forceY forceZ normalForce
+      1 40 40 50 48
+      2 40 60 70 45
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   `solids/linearElasticity/punch`
@@ -778,12 +778,12 @@ equal to $$3-4\nu$$.
 
   - Output file format:
 
-    ```c++
-    # Time dispX dispY dispZ forceX forceY forceZ
-    1 0.1 0.1 0.1 40 40 50
-    2 0.1 0.2 0.2 40 60 70
-    ...
-    ```
+      ```c++
+      # Time dispX dispY dispZ forceX forceY forceZ
+      1 0.1 0.1 0.1 40 40 50
+      2 0.1 0.2 0.2 40 60 70
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   `solids/linearElasticity/punch`
@@ -836,12 +836,12 @@ equal to $$3-4\nu$$.
 
   - Output file format:
 
-    ```c++
-    # Time kineticEnergy
-    1 0.10
-    2 0.11
-    ...
-    ```
+      ```c++
+      # Time kineticEnergy
+      1 0.10
+      2 0.11
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   `None`
@@ -887,12 +887,12 @@ equal to $$3-4\nu$$.
 
   - Output file format:
 
-    ```c++
-    # Time Dx Dy Dz magD
-    1 0.10 0.20 0.10 0.24494897
-    2 0.11 0.20 0.22 0.26551836
-    ...
-    ```
+      ```c++
+      # Time Dx Dy Dz magD
+      1 0.10 0.20 0.10 0.24494897
+      2 0.11 0.20 0.22 0.26551836
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   `solids/hyperelasticity/cylinderCrush`
@@ -959,12 +959,12 @@ This function object is currently only implemented for serial run!
 
   - Output file format:
 
-    ```c++
-    # PointID PointCoord Dx Dy Dz mag
-    152 (0.2 0.3 0.5) 0.1 0.2 0.1 0.2449
-    258 (0.4 0.3 0.5) 0.1 0.2 0.2 0.3
-    ...
-    ```
+      ```c++
+      # PointID PointCoord Dx Dy Dz mag
+      152 (0.2 0.3 0.5) 0.1 0.2 0.1 0.2449
+      258 (0.4 0.3 0.5) 0.1 0.2 0.2 0.3
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   None.
@@ -1058,12 +1058,12 @@ This function object is currently only implemented for serial run!
 
   - Output file format:
 
-    ```c++
-    # Time value
-    1 225
-    2 226
-    ...
-    ```
+      ```c++
+      # Time value
+      1 225
+      2 226
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   `None`
@@ -1105,9 +1105,9 @@ This function object is currently only implemented for serial run!
 
   - `referencePoint` is a coordinate at which the potential energy is zero.
 
-    ```note
-    The value for the uniform gravity field $g$ is specified at `constant/g`!
-    ```
+  ```note
+  The value for the uniform gravity field $g$ is specified at `constant/g`!
+  ```
 
 - **Optional arguments**
 
@@ -1119,12 +1119,12 @@ This function object is currently only implemented for serial run!
 
   - Output file format:
 
-    ```c++
-    # Time potentialEnergy
-    1 500
-    2 520
-    ...
-    ```
+      ```c++
+      # Time potentialEnergy
+      1 500
+      2 520
+      ...
+      ```
 
 - **Tutorial case in which it is used:**
   `None`
@@ -1238,9 +1238,9 @@ This function object is currently only implemented for serial run!
 
   - `historyPatch` is the name of the patch.
 
-    ```note
-    The non-existing patch name will not stop the simulation.
-    ```
+      ```note
+      The non-existing patch name will not stop the simulation.
+      ```
 
 - **Optional arguments**
 
@@ -1253,10 +1253,24 @@ This function object is currently only implemented for serial run!
   - Output file format:
 
     ```c++
-    # Time torqueX torqueY torqueZ
-    1 10 12 13
-    2 12 13 13
-    ...
+    functions
+    {
+        cavityAnalytical
+        {
+            type sphericalCavityAnalyticalSolution;
+
+            farFieldTractionZ 1e6;
+            cavityRadius 0.2;
+            E 200e9;
+            nu 0.3;
+
+            // Optional
+            cellDisplacement yes;
+            pointDisplacement no;
+            cellStress yes;
+            pointStress no;
+        }
+    }
     ```
 
 - **Tutorial case in which it is used:**
