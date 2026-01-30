@@ -44,4 +44,13 @@ timeFormat      general;
 
 timePrecision   6;
 
+functions
+{
+    displacement
+    {
+        type    solidPointDisplacement;
+        point   (0 1 0);
+    }
+}
+
 // ************************************************************************* //

@@ -26,6 +26,7 @@ REGRESSION_TESTS=(
     "fluidSolidInteraction/3dTube"
     "fluidSolidInteraction/beamInCrossFlow"
     "fluidSolidInteraction/flexibleDamBreak"
+    "fluidSolidInteraction/perpendicularFlap"
 )
 
 failures=0
