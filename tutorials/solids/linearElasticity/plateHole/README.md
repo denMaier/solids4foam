@@ -19,7 +19,7 @@ Prepared by Philip Cardiff and Ivan Batistić
 ## Case Overview
 
 In this case, a thin, infinitely large plate with a circular hole is subjected to
-uniaxial tension of $\sigma_{xx} = T = 1$ MPa, see Figure 1. Owing to the symmetry
+uniaxial tension of $$\sigma_{xx} = T = 1$$ MPa, see Figure 1. Owing to the symmetry
 of the geometry and loading, only one quarter of the plate is modelled.
 To minimise the influence of the finite computational boundaries, the exact
 tractions obtained from the analytical solution [1,2] are prescribed
@@ -39,12 +39,13 @@ right
 
 Symmetry boundary conditions are applied on
 boundaries AB and DE, while zero traction is specified on the hole boundary.
-The material properties are defined by a Young’s modulus of $E = 200 GPa$
- and a Poisson’s ratio of $\nu = 0.3$. Gravitational and inertial effects are neglected,
+The material properties are defined by a Young’s modulus of $$E = 200 GPa$$
+ and a Poisson’s ratio of $$\nu = 0.3$$. Gravitational and inertial effects are neglected,
 and the case is solved using one loading increment.
+
 ![Geometry](./images/plateHole-geometry.png)
 
-Figure 1 - Problem geometry [3]
+**Figure 1 - Problem geometry [3]**
 
 ---
 
@@ -67,8 +68,8 @@ $$
 +\sin (4\theta)\right) + \dfrac{3}{2}\dfrac{R^4}{r^4}\sin (4\theta) \right].
 $$
 
-where $r=\sqrt{x^2+y^2}$ and $\theta=\tan^{-1}(y/x)$ are the usual polar co-ordinates.
-$R$ is the hole radius, .
+where $$r=\sqrt{x^2+y^2}$$ and $$\theta=\tan^{-1}(y/x)$$ are the usual polar co-ordinates.
+$$R$$ is the hole radius, .
 
 A custom `plateHoleAnalyticalSolution` function object is added to the
  `controlDict` to calculate the analytical solutions for displacement and stress
@@ -85,9 +86,9 @@ plateHoleAnalyticalSolution1
 }
 ```
 
-The function object prints the average $L_1$, $L_2$, and $L_\infty$ norms for the
- stress components ($\sigma_{xx}$, $\sigma_{yy}$, and $\sigma_{xy}$) and for the
- displacement field:
+The function object prints the average $$L_1$$, $$L_2$$, and $$L_\infty$$ norms
+ for the stress components ($$\sigma_{xx}$$, $$\sigma_{yy}$$, and $$\sigma_{xy}$$)
+ and for the displacement field:
 
 ```c++
 Writing cellStressDifference field
@@ -108,7 +109,8 @@ Writing DDifference field
     1.2549e-08 1.37329e-08 4.24642e-08
 ```
 
-In `solids4foam` the error normas  $L_1$,$L_2$ and $L_\inf$ are defines as:
+In `solids4foam` the error normas  $$L_1$$,$$L_2$$ and $$L_\inf$$ are defines as:
+
 $$
 L_1 =\frac{1}{N_{\text{c}}} \sum_{i=1}^{N_{\text{c}}} | \Delta \phi_i|,
 $$
@@ -121,8 +123,8 @@ $$
 L_{\infty} = \max_{1 \leq i \leq N_{\text{c}}} |\Delta \phi_i|.
 $$
 
-where $\Delta \phi_i$ is the difference between expected and predicted solutions
-For variable $\phi$ at computational nodes and $N_{\text{c}}$ is the
+where $$\Delta \phi_i$$ is the difference between expected and predicted solutions
+For variable $$\phi$$ at computational nodes and $$N_{\text{c}}$$ is the
 overall number of computational nodes, i.e. cells.
 
 ---
