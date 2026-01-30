@@ -57,7 +57,7 @@ maxAlphaCo      0.5;
 
 functions
 {
-    disp
+    displacement
     {
         type    solidPointDisplacement;
         point   (0.292 0.07999997 0);
