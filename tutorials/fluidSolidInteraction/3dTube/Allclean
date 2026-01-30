@@ -37,7 +37,7 @@ then
 fi
 
 # Link files back to default with pimpleFluid
-for file in $(find ./0 ./constant ./system -name '*.pimpleFluid')
+for file in $(find ./0 ./constant ./system -name '*.robin')
 do
     ln -vnsf ${file##*/} ${file%.*}
 done
