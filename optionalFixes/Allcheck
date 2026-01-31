@@ -3,10 +3,12 @@ cd ${0%/*} || exit 1    # run from this directory
 
 echo "optionalFixes/Allcheck"
 
-# This script reports on files that require fixes in the OpenFOAM installation.
-# To skip these checks, set S4F_NO_FILE_FIXES=1, i.e.
-#   export S4F_NO_FILE_FIXES=1
-# To see the consequence of these fixes, visit www.solids4foam.com.
+# This script reports on files that can be optionally fixed in the OpenFOAM
+# installation. To see the consequence of these fixes, visit www.solids4foam.com.
+
+# By default, only give a warning
+# Comment this line if you want the checks to be performed
+S4F_NO_FILE_FIXES=1
 
 # Function for the checking and reporting how to replace a file
 # Arguments:
