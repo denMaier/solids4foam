@@ -7,16 +7,13 @@
 FROM philippic/foam-extend-4.1:ubuntu20.04-petsc-no-openmp-system-blas
 
 # File Author / Maintainer
-MAINTAINER Philip Cardiff <philip.cardiff@ucd.ie>
+LABEL maintainer="Philip Cardiff <philip.cardiff@ucd.ie>"
 
 # Change default shell to bash
 SHELL ["/bin/bash", "-c"]
 
 # Add solids4Foam
-COPY . /home/dockeruser/solids4foam
-
-# Change ownership to dockeruser
-RUN chown -R dockeruser:dockeruser /home/dockeruser/solids4foam
+COPY --chown=dockeruser:dockeruser . /home/dockeruser/solids4foam
 
 # Change user to dockeruser
 USER dockeruser

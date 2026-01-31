@@ -7,7 +7,7 @@
 FROM philippic/openfoam-v2412:ubuntu-22.04-petsc-no-openmp-system-blas
 
 # File Author / Maintainer
-MAINTAINER Philip Cardiff <philip.cardiff@ucd.ie>
+LABEL maintainer="Philip Cardiff <philip.cardiff@ucd.ie>"
 
 # Change default shell to bash
 SHELL ["/bin/bash", "-c"]
