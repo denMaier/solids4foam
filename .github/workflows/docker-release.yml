@@ -40,6 +40,6 @@ jobs:
           file: ${{ matrix.image.file }}
           push: true
           tags: |
-            philippic/solids4foam:${{ inputs.version }}-${{ matrix.image.name }}
-            philippic/solids4foam:${{ inputs.version }}-${{ matrix.image.name }}-latest
-            philippic/solids4foam:${{ github.sha }}-${{ matrix.image.name }}
+            solids4foam/solids4foam:${{ inputs.version }}-${{ matrix.image.name }}
+            solids4foam/solids4foam:${{ inputs.version }}-${{ matrix.image.name }}-latest
+            solids4foam/solids4foam:${{ github.sha }}-${{ matrix.image.name }}
