@@ -6,9 +6,10 @@ echo "optionalFixes/Allcheck"
 # This script reports on files that can be optionally fixed in the OpenFOAM
 # installation. To see the consequence of these fixes, visit www.solids4foam.com.
 
-# By default, only give a warning
-# Comment this line if you want the checks to be performed
-S4F_NO_FILE_FIXES=1
+# If S4F_NO_FILE_FIXES is not defined, then set it to 1
+# To enable checks, set S4F_NO_FILE_FIXES to 0 on the command line, e.g
+# export S4F_NO_FILE_FIXES=0
+: "${S4F_NO_FILE_FIXES:=1}"
 
 # Function for the checking and reporting how to replace a file
 # Arguments:
@@ -18,9 +19,12 @@ S4F_NO_FILE_FIXES=1
 #
 checkAndReport()
 {
-    if [ -n "$S4F_NO_FILE_FIXES" ]
+    if [ "$S4F_NO_FILE_FIXES" = "1" ]
     then
+        echo
         echo "The S4F_NO_FILE_FIXES variable is set so checks will not be performed"
+        echo "To enable these checks, set the S4F_NO_FILE_FIXES variable to 0, i.e."
+        echo "export S4F_NO_FILE_FIXES=0"
     elif cmp --silent "./${1}/${2}" "${3}/${2}"
     then
         echo "'${2}' has already been replaced"
