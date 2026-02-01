@@ -21,7 +21,7 @@ USER dockeruser
 # Compile solids4Foam
 RUN source /home/dockeruser/foam/foam-extend-4.1/etc/bashrc && \
     cd /home/dockeruser/solids4foam && \
-    export S4F_NO_FILE_FIXES=1; ./Allwmake
+    ./Allwmake
 
 # Clean log files
 RUN cd /home/dockeruser/solids4foam && \

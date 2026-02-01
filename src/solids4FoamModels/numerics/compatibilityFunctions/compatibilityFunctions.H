@@ -163,6 +163,23 @@ namespace Foam
     #endif
     }
 
+    // Provide OpenFOAM.com ends_with function
+    inline bool endsWith(const word& w, const char* s)
+    {
+        const auto len = std::strlen(s);
+        return
+            w.size() >= len
+         && !w.compare(w.size() - len, word::npos, s, len);
+    }
+
+    // Provide OpenFOAM.com ends_with function
+    inline bool endsWith(const word& w, const word& s)
+    {
+        return
+            w.size() >= s.size()
+         && !w.compare(w.size() - s.size(), word::npos, s);
+    }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
