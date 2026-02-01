@@ -20,6 +20,7 @@ License
 #include "solidSymmetryFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
+#include "compatibilityFunctions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -150,12 +151,9 @@ tmp<Field<scalar> > solidSymmetryFvPatchScalarField::snGrad() const
     // Do not apply corrections on old-time or previous fields as the gradients
     // do not exist
     bool applyCorrection = true;
-    if (fieldName.size() > 2)
+    if (endsWith(fieldName, "_0") || endsWith(fieldName, "PrevIter"))
     {
-        if (fieldName.ends_with("_0") || fieldName.ends_with("PrevIter"))
-        {
-            applyCorrection = false;
-        }
+        applyCorrection = false;
     }
 
     if (applyCorrection)
@@ -215,12 +213,9 @@ void solidSymmetryFvPatchScalarField::evaluate(const Pstream::commsTypes)
     // Do not apply corrections on old-time or previous fields as the gradients
     // do not exist
     bool applyCorrection = true;
-    if (fieldName.size() > 2)
+    if (endsWith(fieldName, "_0") || endsWith(fieldName, "PrevIter"))
     {
-        if (fieldName.ends_with("_0") || fieldName.ends_with("PrevIter"))
-        {
-            applyCorrection = false;
-        }
+        applyCorrection = false;
     }
 
     if (applyCorrection)
