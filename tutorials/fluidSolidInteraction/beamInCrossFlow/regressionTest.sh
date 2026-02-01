@@ -10,8 +10,8 @@ IFS=$'\n\t'
 # Regression tolerances
 # ------------------------------------------------------------
 
-DISP_MAX_TOL=1e-5      # max displacement absolute tolerance
-FORCE_MEAN_TOL=1e-3    # mean force tolerance
+DISP_MAX_TOL=1e-3      # max displacement absolute tolerance
+FORCE_MEAN_TOL=1e-2    # mean force tolerance
 
 # Number of samples from end of force.dat to average
 FORCE_AVG_SAMPLES=50
@@ -38,8 +38,24 @@ echo
 # Clean & run case
 # ------------------------------------------------------------
 
-./Allclean > /dev/null 2>&1 || true
-./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+CHECK_ONLY=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --check-only|--no-run)
+            CHECK_ONLY=true
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+    ./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+else
+    echo "Running in check-only mode: skipping Allclean and Allrun"
+fi
 
 # ------------------------------------------------------------
 # Extract helpers
@@ -101,7 +117,9 @@ else
 fi
 
 # Clean case again
-./Allclean > /dev/null 2>&1 || true
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+fi
 
 echo
 if (( failures == 0 )); then

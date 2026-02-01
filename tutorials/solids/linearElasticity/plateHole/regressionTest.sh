@@ -18,7 +18,7 @@ ALLRUN_LOGFILE="log.Allrun"
 
 echo "============================================================"
 echo "Plate-with-hole regression test"
-echo "DDifference LInf         < ${DISP_TOL}"
+echo "DDifference LInf        < ${DISP_TOL}"
 echo "pointDDifference LInf   < ${POINT_DISP_TOL}"
 echo "Stress component-0 LInf < ${STRESS_TOL}"
 echo "============================================================"
