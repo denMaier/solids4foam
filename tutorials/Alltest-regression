@@ -5,8 +5,8 @@ IFS=$'\n\t'
 # -------------------------------------------------------------------------
 # solids4Foam regression test driver
 #
-# Runs selected physics-based regression tests.
-# These tests are slower and deeper than the standard Alltest smoke tests.
+# Copies regression test cases to a separate directory and
+# runs them there to avoid polluting the original tutorials.
 # -------------------------------------------------------------------------
 
 echo "============================================================"
@@ -14,6 +14,11 @@ echo "solids4Foam regression tests"
 echo "============================================================"
 
 ROOT_DIR="$(pwd)"
+REG_ROOT="${ROOT_DIR}/../tutorialsTest-regression"
+
+# Create regression root directory
+rm -rf "${REG_ROOT}"
+mkdir -p "${REG_ROOT}"
 
 # List of regression test directories (relative to tutorials/)
 REGRESSION_TESTS=(
@@ -37,7 +42,15 @@ for testCase in "${REGRESSION_TESTS[@]}"; do
     echo "Running regression test: ${testCase}"
     echo "------------------------------------------------------------"
 
-    cd "${ROOT_DIR}/${testCase}"
+    SRC_CASE="${ROOT_DIR}/${testCase}"
+    DST_CASE="${REG_ROOT}/${testCase}"
+
+    # Copy test case (fresh copy each time)
+    rm -rf "${DST_CASE}"
+    mkdir -p "$(dirname "${DST_CASE}")"
+    cp -a "${SRC_CASE}" "${DST_CASE}"
+
+    cd "${DST_CASE}"
 
     if [[ ! -x ./regressionTest.sh ]]; then
         echo "FAIL: regressionTest.sh not found or not executable in ${testCase}"
