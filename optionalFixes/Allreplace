@@ -29,6 +29,13 @@ replaceFile()
 # Different checks required for each version of OpenFOAM/foam
 if [ "$WM_PROJECT" = "foam" ]
 then
+    # Fix required for newer compilers
+    replaceFile \
+        "foam-extend-4.1" \
+        "FixedList.C" \
+        "$FOAM_SRC/foam/containers/Lists/FixedList" \
+        "$FOAM_SRC/foam"
+
     # This fixes the segmentation error that happens at the end of solver due to
     # a mesh object being freed twice
     replaceFile \
