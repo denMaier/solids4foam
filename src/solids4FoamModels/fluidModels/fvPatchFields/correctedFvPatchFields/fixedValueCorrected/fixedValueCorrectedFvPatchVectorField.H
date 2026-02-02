@@ -96,13 +96,9 @@ public:
         fixedValueCorrectedFvPatchVectorField
         (
             const fixedValueCorrectedFvPatchVectorField&
-        );
-
-        //- Construct as copy setting internal field reference
-        fixedValueCorrectedFvPatchVectorField
-        (
-            const fixedValueCorrectedFvPatchVectorField&,
-            const DimensionedField<vector, volMesh>&
+#ifdef OPENFOAM_ORG
+        ) = delete;
+#else
         );
 
         //- Return a clone
@@ -113,6 +109,14 @@ public:
                 new fixedValueCorrectedFvPatchVectorField(*this)
             );
         }
+#endif
+
+        //- Construct as copy setting internal field reference
+        fixedValueCorrectedFvPatchVectorField
+        (
+            const fixedValueCorrectedFvPatchVectorField&,
+            const DimensionedField<vector, volMesh>&
+        );
 
         //- Clone with an internal field reference
         virtual tmp<fvPatchField<vector>> clone

@@ -73,6 +73,7 @@ Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorFie
 {}
 
 
+#ifndef OPENFOAM_ORG
 Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorField
 (
     const fixedValueCorrectedFvPatchVectorField& mwvpvf
@@ -80,7 +81,7 @@ Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorFie
 :
     fixedValueFvPatchVectorField(mwvpvf)
 {}
-
+#endif
 
 Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorField
 (

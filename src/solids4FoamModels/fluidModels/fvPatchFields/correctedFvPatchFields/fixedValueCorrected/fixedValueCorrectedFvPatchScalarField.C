@@ -34,7 +34,8 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarField
+Foam::fixedValueCorrectedFvPatchScalarField::
+fixedValueCorrectedFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -45,7 +46,8 @@ Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarFie
 {}
 
 
-Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarField
+Foam::fixedValueCorrectedFvPatchScalarField::
+fixedValueCorrectedFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -60,7 +62,8 @@ Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarFie
 {}
 
 
-Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarField
+Foam::fixedValueCorrectedFvPatchScalarField::
+fixedValueCorrectedFvPatchScalarField
 (
     const fixedValueCorrectedFvPatchScalarField& ptf,
     const fvPatch& p,
@@ -73,16 +76,19 @@ Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarFie
 {}
 
 
-Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarField
+#ifndef OPENFOAM_ORG
+Foam::fixedValueCorrectedFvPatchScalarField::
+fixedValueCorrectedFvPatchScalarField
 (
     const fixedValueCorrectedFvPatchScalarField& mwvpvf
 )
 :
     fixedValueFvPatchScalarField(mwvpvf)
 {}
+#endif
 
-
-Foam::fixedValueCorrectedFvPatchScalarField::fixedValueCorrectedFvPatchScalarField
+Foam::fixedValueCorrectedFvPatchScalarField::
+fixedValueCorrectedFvPatchScalarField
 (
     const fixedValueCorrectedFvPatchScalarField& mwvpvf,
     const DimensionedField<scalar, volMesh>& iF
