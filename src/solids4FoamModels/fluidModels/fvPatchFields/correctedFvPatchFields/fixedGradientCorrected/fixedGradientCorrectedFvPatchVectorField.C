@@ -21,6 +21,7 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
 #include "patchCorrectionVectors.H"
+#include "compatibilityFunctions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -184,22 +185,13 @@ void fixedGradientCorrectedFvPatchVectorField::evaluate
         this->updateCoeffs();
     }
 
-    if
-    (
-        nonOrthogonalCorrections_
-     && db().foundObject<volTensorField>("grad(" + internalField().name() + ")")
-    )
+    const word gradName(internalFieldName(*this));
+
+    if (nonOrthogonalCorrections_ && db().foundObject<volTensorField>(gradName))
     {
         // Lookup the gradient field
         const fvPatchField<tensor>& gradField =
-            patch().lookupPatchField<volTensorField, tensor>
-            (
-            #ifdef OPENFOAM_NOT_EXTEND
-                "grad(" + internalField().name() + ")"
-            #else
-                "grad(" + dimensionedInternalField().name() + ")"
-            #endif
-            );
+            patch().lookupPatchField<volTensorField, tensor>(gradName);
 
         // Non-orthogonal correction vectors
         const vectorField k(patchCorrectionVectors(patch()));

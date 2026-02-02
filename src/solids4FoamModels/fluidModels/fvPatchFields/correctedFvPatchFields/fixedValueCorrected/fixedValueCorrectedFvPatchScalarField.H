@@ -108,7 +108,10 @@ public:
         //- Return a clone
         virtual tmp<fvPatchField<scalar>> clone() const
         {
-            return tmp<fvPatchField<scalar>>::New(*this);
+            return tmp<fvPatchField<scalar>>
+            (
+                new fixedValueCorrectedFvPatchScalarField(*this)
+            );
         }
 
         //- Clone with an internal field reference
@@ -117,7 +120,10 @@ public:
             const DimensionedField<scalar, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<scalar>>::New(*this, iF);
+            return tmp<fvPatchField<scalar>>
+            (
+                new fixedValueCorrectedFvPatchScalarField(*this, iF)
+            );
         }
 
 

@@ -30,6 +30,7 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
 #include "patchCorrectionVectors.H"
+#include "compatibilityFunctions.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -39,7 +40,7 @@ Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorFie
     const DimensionedField<vector, volMesh>& iF
 )
 :
-    fixedValueFvPatchVectorField(p, iF, Zero),
+    fixedValueFvPatchVectorField(p, iF),
     nonOrthogonalCorrections_(true)
 {}
 
@@ -56,9 +57,7 @@ Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorFie
     (
         dict.lookupOrDefault<Switch>("nonOrthogonalCorrections", true)
     )
-{
-    fvPatchFieldBase::readDict(dict);
-}
+{}
 
 
 Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorField
@@ -69,7 +68,7 @@ Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorFie
     const fvPatchFieldMapper& mapper
 )
 :
-    fixedValueFvPatchVectorField(p, iF, Zero),
+    fixedValueFvPatchVectorField(ptf, p, iF, mapper),
     nonOrthogonalCorrections_(true)
 {}
 
@@ -98,22 +97,13 @@ Foam::fixedValueCorrectedFvPatchVectorField::fixedValueCorrectedFvPatchVectorFie
 Foam::tmp<Foam::Field<Foam::vector> >
 Foam::fixedValueCorrectedFvPatchVectorField::snGrad() const
 { 
-    if
-    (
-        nonOrthogonalCorrections_
-     && db().foundObject<volTensorField>("grad(" + internalField().name() + ")")
-    )
+    const word gradName(internalFieldName(*this));
+
+    if (nonOrthogonalCorrections_ && db().foundObject<volTensorField>(gradName))
     {
         // Lookup the gradient field
         const fvPatchField<tensor>& gradField =
-            patch().lookupPatchField<volTensorField, tensor>
-            (
-            #ifdef OPENFOAM_NOT_EXTEND
-                "grad(" + internalField().name() + ")"
-            #else
-                "grad(" + dimensionedInternalField().name() + ")"
-            #endif
-            );
+            patch().lookupPatchField<volTensorField, tensor>(gradName);
 
         // Non-orthogonal correction vectors
         const vectorField k(patchCorrectionVectors(patch()));
@@ -135,17 +125,14 @@ Foam::fixedValueCorrectedFvPatchVectorField::snGrad() const
 Foam::tmp<Foam::Field<Foam::vector> >
 Foam::fixedValueCorrectedFvPatchVectorField::gradientBoundaryCoeffs() const
 {
-    if
-    (
-        nonOrthogonalCorrections_
-     && db().foundObject<volTensorField>("grad(" + internalField().name() + ")")
-    )
+    const word gradName(internalFieldName(*this));
+
+    if (nonOrthogonalCorrections_ && db().foundObject<volTensorField>(gradName))
     {
+        // Lookup the gradient field
         const fvPatchField<tensor>& gradField =
-            patch().lookupPatchField<volTensorField, tensor>
-            (
-                "grad(" + internalField().name() + ")"
-            );
+            patch().lookupPatchField<volTensorField, tensor>(gradName);
+
 
         // Non-orthogonal correction vectors
         const vectorField k(patchCorrectionVectors(patch()));
