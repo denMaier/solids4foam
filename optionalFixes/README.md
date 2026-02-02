@@ -9,6 +9,8 @@ are using OpenFOAM.org, OpenFOAM.com, or foam-extend.
 
 ## OpenFOAM.org
 
+- `FixedList.C`: This fix is required for newer compilers.
+
 - `GeometricField.C`: this fix is required for consistent time discretisation.
   Some FSI cases may crash without this fix.
 
