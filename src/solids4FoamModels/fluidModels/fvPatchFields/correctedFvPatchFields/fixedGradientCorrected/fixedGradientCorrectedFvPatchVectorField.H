@@ -16,36 +16,29 @@ License
     along with solids4foam.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    parabolicVelocityFvPatchVectorField
+    fixedGradientCorrectedFvPatchVectorField
 
 Description
-    Boundary condition specifies a parabolic velocity inlet profile
-    (fixed value), given maximum velocity value (peak of the parabola),
-    flow direction n and direction of the parabolic coordinate y
-
-    The parabolic profile is scaled in time according to the following function:
-
-        U = USteady*t^2/sqrt((t1 - t^2)^2 + (t2*t)^2)
-
-    where USteady is the long term steady state centreline velocity, t is the
-    time, and t1 and t2 are scaling parameters.
-    This results in a profile that ramps up to a peak value then reduces to a
-    steady state value.
-
-SourceFiles
-    pulsedParabolicVelocityFvPatchVectorField.C
+    Fixed gradient boundary condition with non-orthogonal corrections.
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
-    Modified by Philip Cardiff, UCD.
+    Philip Cardiff, UCD.
+
+SourceFiles
+    fixedGradientCorrectedFvPatchVectorField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef pulsedParabolicVelocityFvPatchVectorField_H
-#define pulsedParabolicVelocityFvPatchVectorField_H
+#ifndef fixedGradientCorrectedFvPatchVectorField_H
+#define fixedGradientCorrectedFvPatchVectorField_H
 
+#ifdef FOAMEXTEND
+    #include "foamTime.H"
+#endif
 #include "fvPatchFields.H"
-#include "fixedValueCorrectedFvPatchVectorField.H"
+#include "fixedGradientFvPatchFields.H"
+#include "Switch.H"
+#include "interpolationTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,53 +46,44 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-              Class parabolicVelocityFvPatchField Declaration
+             Class fixedGradientCorrectedFvPatchVectorField Declaration
 \*---------------------------------------------------------------------------*/
 
-class pulsedParabolicVelocityFvPatchVectorField
+class fixedGradientCorrectedFvPatchVectorField
 :
-    public fixedValueCorrectedFvPatchVectorField
+    public fixedGradientFvPatchVectorField
 {
-    // Private data
 
-        //- Steady state centreline velocity magnitude
-        scalar steadyValue_;
+    // Private Data
 
-        //- Flow direction
-        vector n_;
+        //- Enable non-orthogonal corrections
+        const Switch nonOrthogonalCorrections_;
 
-        //- Direction of the y-coordinate
-        vector y_;
+        //- Second order accuracy correction
+        const Switch secondOrder_;
 
-        //- Time scaling parameter 1
-        scalar t1_;
+        //- Extrapolate values to the patch using the patch internal gradient
+        //  field. Alternatively, if false, use the gradient at the patch
+        Switch extrapolateValue_;
 
-        //- Time scaling parameter 2
-        scalar t2_;
-
-        //- Bound box min (must be specified duo to bug in parallel run)
-        vector boundBoxMin_;
-
-        //- Bound box max (must be specified duo to bug in parallel run)
-        vector boundBoxMax_;
 
 public:
 
     //- Runtime type information
-    TypeName("pulsedParabolicVelocity");
+    TypeName("fixedGradientCorrected");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        pulsedParabolicVelocityFvPatchVectorField
+        fixedGradientCorrectedFvPatchVectorField
         (
             const fvPatch&,
             const DimensionedField<vector, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        pulsedParabolicVelocityFvPatchVectorField
+        fixedGradientCorrectedFvPatchVectorField
         (
             const fvPatch&,
             const DimensionedField<vector, volMesh>&,
@@ -107,37 +91,38 @@ public:
         );
 
         //- Construct by mapping given
-        //  pulsedParabolicVelocityFvPatchVectorField
-        //  onto a new patch
-        pulsedParabolicVelocityFvPatchVectorField
+        //  fixedGradientCorrectedFvPatchVectorField onto a new patch
+        fixedGradientCorrectedFvPatchVectorField
         (
-            const pulsedParabolicVelocityFvPatchVectorField&,
+            const fixedGradientCorrectedFvPatchVectorField&,
             const fvPatch&,
             const DimensionedField<vector, volMesh>&,
             const fvPatchFieldMapper&
         );
 
-#ifdef OPENFOAM_ORG
         //- Construct as copy
-        pulsedParabolicVelocityFvPatchVectorField
+        fixedGradientCorrectedFvPatchVectorField
         (
-            const pulsedParabolicVelocityFvPatchVectorField&
+            const fixedGradientCorrectedFvPatchVectorField&
+#ifdef OPENFOAM_ORG
         ) = delete;
 #else
+        );
+
         //- Construct and return a clone
         virtual tmp<fvPatchVectorField> clone() const
         {
             return tmp<fvPatchVectorField>
             (
-                new pulsedParabolicVelocityFvPatchVectorField(*this)
+                new fixedGradientCorrectedFvPatchVectorField(*this)
             );
         }
 #endif
 
         //- Construct as copy setting internal field reference
-        pulsedParabolicVelocityFvPatchVectorField
+        fixedGradientCorrectedFvPatchVectorField
         (
-            const pulsedParabolicVelocityFvPatchVectorField&,
+            const fixedGradientCorrectedFvPatchVectorField&,
             const DimensionedField<vector, volMesh>&
         );
 
@@ -149,33 +134,51 @@ public:
         {
             return tmp<fvPatchVectorField>
             (
-                new pulsedParabolicVelocityFvPatchVectorField(*this, iF)
+                new fixedGradientCorrectedFvPatchVectorField(*this, iF)
             );
         }
 
 
+
     // Member functions
 
-        //- Return max value
-        scalar& steadyValue()
-        {
-            return steadyValue_;
-        }
+        // Access
 
-        //- Return flow direction
-        vector& n()
-        {
-            return n_;
-        }
+            // Non-const access to the extrapolateValue flag
+            Switch& extrapolateValue()
+            {
+                return extrapolateValue_;
+            }
 
-        //- Return y direction
-        vector& y()
-        {
-            return y_;
-        }
 
-        //- Update coefficients
+        // Mapping functions
+
+            //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const fvPatchFieldMapper&
+            );
+
+            //- Reverse map the given fvPatchField onto this fvPatchField
+            virtual void rmap
+            (
+                const fvPatchVectorField&,
+                const labelList&
+            );
+
+
+        //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();
+
+        //- Evaluate the patch field
+        virtual void evaluate
+        (
+#ifdef OPENFOAM_NOT_EXTEND
+            const Pstream::commsTypes commsType = Pstream::commsTypes::blocking
+#else
+            const Pstream::commsTypes commsType = Pstream::blocking
+#endif
+        );
 
         //- Write
         virtual void write(Ostream&) const;
