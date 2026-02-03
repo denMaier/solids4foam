@@ -24,11 +24,28 @@ echo "Stress component-0 LInf < ${STRESS_TOL}"
 echo "============================================================"
 echo
 
-# Clean case
-./Allclean > /dev/null 2>&1 || true
+# ------------------------------------------------------------
+# Clean & run case
+# ------------------------------------------------------------
 
-# Run case
-./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+CHECK_ONLY=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --check-only|--no-run)
+            CHECK_ONLY=true
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+    ./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+else
+    echo "Running in check-only mode: skipping Allclean and Allrun"
+fi
 
 # ------------------------------------------------------------
 # Extract helpers
@@ -44,6 +61,7 @@ extract_disp_linf() {
 
 extract_stress_linf_comp0() {
     grep -A6 "Writing cellStressDifference field" "${SOLVER_LOGFILE}" \
+        | tail -6 \
         | awk '
             /Component:[[:space:]]*0/ {getline; getline; print $3}
         '
@@ -81,16 +99,12 @@ else
     printf "FAIL: pointDDifference LInf = %.6g\n" "${point_disp_linf}"
     failures=$((failures + 1))
 fi
-
 if awk "BEGIN {exit !(${stress_linf} < ${STRESS_TOL})}"; then
     printf "PASS: stress component-0 LInf = %.6g\n" "${stress_linf}"
 else
     printf "FAIL: stress component-0 LInf = %.6g\n" "${stress_linf}"
     failures=$((failures + 1))
 fi
-
-# Clean case
-./Allclean > /dev/null 2>&1 || true
 
 echo
 if (( failures == 0 )); then
