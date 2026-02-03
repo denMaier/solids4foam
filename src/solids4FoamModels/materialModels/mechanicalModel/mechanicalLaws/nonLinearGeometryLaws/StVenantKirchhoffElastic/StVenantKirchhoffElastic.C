@@ -93,6 +93,10 @@ Foam::StVenantKirchhoffElastic::StVenantKirchhoffElastic
 
     // Set bulk modulus
     K_ = lambda_ + (2.0/3.0)*mu_;
+
+    // Ensure old-times are created at the start tme
+    F().storeOldTime();
+    Ff().storeOldTime();
 }
 
 
