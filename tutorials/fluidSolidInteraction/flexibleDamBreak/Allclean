@@ -20,7 +20,7 @@ fi
 [ -f system/fluid/blockMeshDict ] && mkdir constant/fluid/polyMesh && cp system/fluid/blockMeshDict constant/fluid/polyMesh/
 
 #rm -rf constant/*/polyMesh
-rm -rf case.foam displacement.pdf 0/fluid/alpha1 0/fluid/alpha.water
+rm -rf case.foam displacement.pdf 0/fluid/alpha1 0/fluid/alpha.water postProcessing
 
 # Convert case version to FOAM EXTEND
 solids4Foam::convertCaseFormatFoamExtend .

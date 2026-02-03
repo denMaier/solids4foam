@@ -27,6 +27,11 @@ ALLRUN_LOGFILE="log.Allrun"
 DISP_FILE="postProcessing/0/solidPointDisplacement_displacement.dat"
 FORCE_FILE="postProcessing/fluid/forces/0/force.dat"
 
+# foam-extend writes forces to a 'forces' sub-drectory so we will create
+# a link
+mkdir -p postProcessing/fluid/forces/0/
+(cd postProcessing/fluid/forces/0 && ln -s ../../../../forces/0/forces.dat)
+
 echo "============================================================"
 echo "Beam-in-cross-flow FSI regression test"
 echo "Max displacement difference < ${DISP_MAX_TOL}"
