@@ -64,12 +64,12 @@ mkdir -p postProcessing/fluid/forces/0
 
     # foam-extend writes forces to a 'forces' sub-directory so we will create a
     # link
-    if [[ ! -e forces.dat ]]; then
-        ln -s ../../../../forces/0/forces.dat forces.dat
+    if [[ ! -e force.dat && -f ../../../../forces/0/forces.dat ]]; then
+        ln -s ../../../../forces/0/forces.dat force.dat
     fi
 
-    # OpenFOAM.com uses force.dat instead of forces.dat
-    if [[ ! -e force.dat ]]; then
+    # OpenFOAM.org creates forces.dat instead of force.dat
+    if [[ ! -e force.dat && -f forces.dat ]]; then
         ln -s forces.dat force.dat
     fi
 )
@@ -83,8 +83,21 @@ extract_max_displacement() {
 }
 
 extract_mean_force_tail() {
-    tail -n "${FORCE_AVG_SAMPLES}" "${FORCE_FILE}" \
-        | awk '{sum+=$2; n++} END {if (n>0) print sum/n}'
+    tail -n "${FORCE_AVG_SAMPLES}" "${FORCE_FILE}" | \
+    awk '
+    {
+        # Remove parentheses
+        gsub(/[()]/, "", $0)
+
+        # After cleanup, fields are:
+        # $1 = time
+        # $2 = Fx (both formats)
+        sum += $2
+        n++
+    }
+    END {
+        if (n > 0) print sum/n
+    }'
 }
 
 abs() {
