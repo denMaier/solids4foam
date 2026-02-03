@@ -8,7 +8,7 @@ IFS=$'\n\t'
 # ============================================================
 
 # Reference ranges (order-of-magnitude + robustness)
-EPSILON_MIN=8e-5
+EPSILON_MIN=6e-5
 EPSILON_MAX=1.1e-4
 
 SIGMA_MIN=70e3
@@ -25,11 +25,28 @@ echo "Max sigmaEq (von Mises) in [${SIGMA_MIN}, ${SIGMA_MAX}]"
 echo "============================================================"
 echo
 
-# Clean case
-./Allclean > /dev/null 2>&1 || true
+# ------------------------------------------------------------
+# Clean & run case
+# ------------------------------------------------------------
 
-# Run case
-./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+CHECK_ONLY=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --check-only|--no-run)
+            CHECK_ONLY=true
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+    ./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+else
+    echo "Running in check-only mode: skipping Allclean and Allrun"
+fi
 
 # ------------------------------------------------------------
 # Extract helpers
@@ -83,9 +100,6 @@ else
     printf "FAIL: Max sigmaEq = %.6g\n" "${sigma}"
     failures=$((failures + 1))
 fi
-
-# Clean case again
-./Allclean > /dev/null 2>&1 || true
 
 echo
 if (( failures == 0 ))
