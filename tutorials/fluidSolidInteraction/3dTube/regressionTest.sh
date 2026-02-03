@@ -57,12 +57,22 @@ else
     echo "Running in check-only mode: skipping Allclean and Allrun"
 fi
 
-# foam-extend writes forces to a 'forces' sub-drectory so we will create a link
-mkdir -p postProcessing/fluid/forces/0/
-(cd postProcessing/fluid/forces/0 && ln -s ../../../../forces/0/forces.dat)
+# OpenFOAM variant compatibility
+mkdir -p postProcessing/fluid/forces/0
+(
+    cd postProcessing/fluid/forces/0
 
-# OpenFOAM.com uses force.dat instead of forces.dat so we will create a link
-(cd postProcessing/fluid/forces/0 && ln -s forces.dat force.dat)
+    # foam-extend writes forces to a 'forces' sub-directory so we will create a
+    # link
+    if [[ ! -e forces.dat ]]; then
+        ln -s ../../../../forces/0/forces.dat forces.dat
+    fi
+
+    # OpenFOAM.com uses force.dat instead of forces.dat
+    if [[ ! -e force.dat ]]; then
+        ln -s forces.dat force.dat
+    fi
+)
 
 # ------------------------------------------------------------
 # Extract helpers
