@@ -38,8 +38,41 @@ echo
 # Clean & run case
 # ------------------------------------------------------------
 
-./Allclean > /dev/null 2>&1 || true
-./Allrun robin > "${ALLRUN_LOGFILE}" 2>&1
+CHECK_ONLY=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --check-only|--no-run)
+            CHECK_ONLY=true
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+    ./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+else
+    echo "Running in check-only mode: skipping Allclean and Allrun"
+fi
+
+# OpenFOAM variant compatibility
+mkdir -p postProcessing/fluid/forces/0
+(
+    cd postProcessing/fluid/forces/0
+
+    # foam-extend writes forces to a 'forces' sub-directory so we will create a
+    # link
+    if [[ ! -e force.dat && -f ../../../../forces/0/forces.dat ]]; then
+        ln -s ../../../../forces/0/forces.dat force.dat
+    fi
+
+    # OpenFOAM.org creates forces.dat instead of force.dat
+    if [[ ! -e force.dat && -f forces.dat ]]; then
+        ln -s forces.dat force.dat
+    fi
+)
 
 # ------------------------------------------------------------
 # Extract helpers
@@ -50,8 +83,21 @@ extract_max_displacement() {
 }
 
 extract_mean_force_tail() {
-    tail -n "${FORCE_AVG_SAMPLES}" "${FORCE_FILE}" \
-        | awk '{sum+=$2; n++} END {if (n>0) print sum/n}'
+    tail -n "${FORCE_AVG_SAMPLES}" "${FORCE_FILE}" | \
+    awk '
+    {
+        # Remove parentheses
+        gsub(/[()]/, "", $0)
+
+        # After cleanup, fields are:
+        # $1 = time
+        # $2 = Fx (both formats)
+        sum += $2
+        n++
+    }
+    END {
+        if (n > 0) print sum/n
+    }'
 }
 
 abs() {
@@ -99,9 +145,6 @@ else
         "${mean_force}" "${force_diff_abs}"
     failures=$((failures + 1))
 fi
-
-# Clean case again
-./Allclean > /dev/null 2>&1 || true
 
 echo
 if (( failures == 0 )); then
