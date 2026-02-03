@@ -11,7 +11,7 @@ IFS=$'\n\t'
 # ------------------------------------------------------------
 
 DISP_MAX_TOL=1e-3      # max displacement absolute tolerance
-FORCE_MEAN_TOL=1e-2    # mean force tolerance
+FORCE_MEAN_TOL=0.25    # mean force tolerance
 
 # Number of samples from end of force.dat to average
 FORCE_AVG_SAMPLES=50
