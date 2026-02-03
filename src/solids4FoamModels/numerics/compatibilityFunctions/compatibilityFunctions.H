@@ -180,6 +180,17 @@ namespace Foam
          && !w.compare(w.size() - s.size(), word::npos, s);
     }
 
+    // Return the dimensionedInternalField/internalField name
+    template<class T>
+    inline word internalFieldName(const fvPatchField<T>& patch)
+    {
+    #ifdef OPENFOAM_NOT_EXTEND
+        return patch.internalField().name();
+    #else
+        return patch.dimensionedInternalField().name();
+    #endif
+    }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

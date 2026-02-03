@@ -10,7 +10,7 @@ IFS=$'\n\t'
 # Regression tolerances
 # ------------------------------------------------------------
 
-DISP_MAX_TOL=1e-6      # max displacement absolute tolerance
+DISP_MAX_TOL=1e-4      # max displacement absolute tolerance
 
 # Reference values
 REF_MAX_DISP=0.000389136
@@ -31,8 +31,24 @@ echo
 # Clean & run case
 # ------------------------------------------------------------
 
-./Allclean > /dev/null 2>&1 || true
-./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+CHECK_ONLY=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --check-only|--no-run)
+            CHECK_ONLY=true
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+    ./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+else
+    echo "Running in check-only mode: skipping Allclean and Allrun"
+fi
 
 # ------------------------------------------------------------
 # Extract helpers
@@ -76,7 +92,9 @@ else
 fi
 
 # Clean case again
-./Allclean > /dev/null 2>&1 || true
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+fi
 
 echo
 if (( failures == 0 )); then

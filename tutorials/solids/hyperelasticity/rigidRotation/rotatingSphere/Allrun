@@ -72,7 +72,7 @@ link_files_for_suffix() {
     while IFS= read -r -d '' f; do
         found=1
         ln -vnsf "$(basename "$f")" "${f%.*}"
-    done < <(find ./0 ./constant ./system -type f -name "*.${suffix}" -print0 2>/dev/null || true)
+    done < <(find -L ./0 ./constant ./system -type f -name "*.${suffix}" -print0 2>/dev/null || true)
 
     if (( !found )); then
         echo "Warning: No *.${suffix} files found under ./0 ./constant ./system."
