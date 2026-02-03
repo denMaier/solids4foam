@@ -27,13 +27,6 @@ ALLRUN_LOGFILE="log.Allrun"
 DISP_FILE="postProcessing/0/solidPointDisplacement_displacement.dat"
 FORCE_FILE="postProcessing/fluid/forces/0/force.dat"
 
-# foam-extend writes forces to a 'forces' sub-drectory so we will create a link
-mkdir -p postProcessing/fluid/forces/0/
-(cd postProcessing/fluid/forces/0 && ln -s ../../../../forces/0/forces.dat)
-
-# OpenFOAM.com uses force.dat instead of forces.dat so we will create a link
-(cd postProcessing/fluid/forces/0 && ln -s forces.dat force.dat)
-
 echo "============================================================"
 echo "Beam-in-cross-flow FSI regression test"
 echo "Max displacement difference < ${DISP_MAX_TOL}"
@@ -45,8 +38,31 @@ echo
 # Clean & run case
 # ------------------------------------------------------------
 
-./Allclean > /dev/null 2>&1 || true
-./Allrun robin > "${ALLRUN_LOGFILE}" 2>&1
+CHECK_ONLY=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --check-only|--no-run)
+            CHECK_ONLY=true
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if [ "$CHECK_ONLY" = false ]; then
+    ./Allclean > /dev/null 2>&1 || true
+    ./Allrun > "${ALLRUN_LOGFILE}" 2>&1
+else
+    echo "Running in check-only mode: skipping Allclean and Allrun"
+fi
+
+# foam-extend writes forces to a 'forces' sub-drectory so we will create a link
+mkdir -p postProcessing/fluid/forces/0/
+(cd postProcessing/fluid/forces/0 && ln -s ../../../../forces/0/forces.dat)
+
+# OpenFOAM.com uses force.dat instead of forces.dat so we will create a link
+(cd postProcessing/fluid/forces/0 && ln -s forces.dat force.dat)
 
 # ------------------------------------------------------------
 # Extract helpers
@@ -106,9 +122,6 @@ else
         "${mean_force}" "${force_diff_abs}"
     failures=$((failures + 1))
 fi
-
-# Clean case again
-./Allclean > /dev/null 2>&1 || true
 
 echo
 if (( failures == 0 )); then
